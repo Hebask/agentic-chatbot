@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db
+from app.core.exceptions import NotFoundError, ValidationError
 from app.schemas.task import TaskCreate, TaskResponse, TaskUpdateStatus
 from app.services.task_service import TaskService
 
@@ -10,9 +11,11 @@ router = APIRouter(prefix="/tasks", tags=["tasks"])
 
 @router.post("", response_model=TaskResponse)
 def create_task(payload: TaskCreate, db: Session = Depends(get_db)) -> TaskResponse:
-    service = TaskService(db)
-    task = service.create_task(payload.title, payload.description)
-    return task
+    try:
+        service = TaskService(db)
+        return service.create_task(payload.title, payload.description)
+    except ValidationError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
 @router.get("", response_model=list[TaskResponse])
@@ -27,8 +30,10 @@ def update_task_status(
     payload: TaskUpdateStatus,
     db: Session = Depends(get_db),
 ) -> TaskResponse:
-    service = TaskService(db)
     try:
+        service = TaskService(db)
         return service.update_task_status(task_id, payload.status)
-    except ValueError as exc:
+    except NotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValidationError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc

@@ -1,7 +1,11 @@
+import logging
+
 from sqlalchemy.orm import Session
 
 from app.services.note_service import NoteService
 from app.services.task_service import TaskService
+
+logger = logging.getLogger(__name__)
 
 
 class ToolExecutor:
@@ -10,6 +14,8 @@ class ToolExecutor:
         self.note_service = NoteService(db)
 
     def execute(self, tool_name: str, arguments: dict) -> dict:
+        logger.info("Executing tool: %s | arguments=%s", tool_name, arguments)
+
         if tool_name == "create_task":
             task = self.task_service.create_task(
                 title=arguments["title"],

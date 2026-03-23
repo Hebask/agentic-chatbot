@@ -1,8 +1,13 @@
 import json
+import logging
+
 from sqlalchemy.orm import Session
 
+from app.services.conversation_service import ConversationService
 from app.services.llm_service import LLMService
 from app.tools.executor import ToolExecutor
+
+logger = logging.getLogger(__name__)
 
 
 class AgentService:
@@ -10,9 +15,30 @@ class AgentService:
         self.db = db
         self.llm = LLMService()
         self.tool_executor = ToolExecutor(db)
+        self.conversation_service = ConversationService(db)
 
-    def handle_message(self, message: str) -> str:
-        response = self.llm.create_initial_response(message)
+    def handle_message(self, message: str, conversation_id: int | None = None) -> tuple[str, int]:
+        if conversation_id is None:
+            conversation = self.conversation_service.create_conversation(
+                title=message[:50].strip() or "New Conversation"
+            )
+            conversation_id = conversation.id
+            logger.info("Created new conversation: %s", conversation_id)
+        else:
+            self.conversation_service.get_conversation(conversation_id)
+
+        self.conversation_service.add_user_message(conversation_id, message)
+
+        history = self.conversation_service.list_messages(conversation_id)
+        llm_messages = [
+            {
+                "role": msg.role,
+                "content": msg.content,
+            }
+            for msg in history
+        ]
+
+        response = self.llm.create_initial_response(llm_messages)
 
         max_iterations = 5
         for _ in range(max_iterations):
@@ -23,9 +49,10 @@ class AgentService:
             ]
 
             if not function_calls:
-                return self.llm.extract_text(response)
+                final_reply = self.llm.extract_text(response)
+                self.conversation_service.add_assistant_message(conversation_id, final_reply)
+                return final_reply, conversation_id
 
-            # For v1, handle one tool call at a time.
             function_call = function_calls[0]
             tool_name = function_call.name
             tool_args_raw = function_call.arguments or "{}"
@@ -39,4 +66,6 @@ class AgentService:
                 tool_output=json.dumps(tool_result),
             )
 
-        return "The agent stopped after reaching the maximum tool-iteration limit."
+        final_reply = "The agent stopped after reaching the maximum tool-iteration limit."
+        self.conversation_service.add_assistant_message(conversation_id, final_reply)
+        return final_reply, conversation_id

@@ -12,19 +12,17 @@ class LLMService:
         )
         self.model = settings.openai_model
 
-    def create_initial_response(self, user_message: str):
+    def create_initial_response(self, messages: list[dict]):
+        input_messages = [
+            {
+                "role": "system",
+                "content": settings.agent_system_prompt,
+            }
+        ] + messages
+
         return self.client.responses.create(
             model=self.model,
-            input=[
-                {
-                    "role": "system",
-                    "content": settings.agent_system_prompt,
-                },
-                {
-                    "role": "user",
-                    "content": user_message,
-                },
-            ],
+            input=input_messages,
             tools=TOOLS,
         )
 

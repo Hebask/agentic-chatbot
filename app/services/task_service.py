@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
 
-from app.repositories.task_repository import TaskRepository
+from app.core.exceptions import NotFoundError, ValidationError
 from app.db.models import Task
+from app.repositories.task_repository import TaskRepository
 
 
 class TaskService:
@@ -11,7 +12,10 @@ class TaskService:
         self.repo = TaskRepository(db)
 
     def create_task(self, title: str, description: str | None = None) -> Task:
-        return self.repo.create(title=title, description=description)
+        cleaned_title = title.strip()
+        if not cleaned_title:
+            raise ValidationError("Task title cannot be empty")
+        return self.repo.create(title=cleaned_title, description=description)
 
     def list_tasks(self) -> list[Task]:
         return self.repo.list_all()
@@ -19,12 +23,12 @@ class TaskService:
     def update_task_status(self, task_id: int, status: str) -> Task:
         normalized_status = status.strip().lower()
         if normalized_status not in self.ALLOWED_STATUSES:
-            raise ValueError(
-                f"Invalid status '{status}'. Allowed: {sorted(self.ALLOWED_STATUSES)}"
+            raise ValidationError(
+                f"Invalid status '{status}'. Allowed values: {sorted(self.ALLOWED_STATUSES)}"
             )
 
         task = self.repo.get_by_id(task_id)
         if not task:
-            raise ValueError(f"Task with id {task_id} not found")
+            raise NotFoundError(f"Task with id {task_id} not found")
 
         return self.repo.update_status(task, normalized_status)

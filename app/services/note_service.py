@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 
+from app.core.exceptions import ValidationError
 from app.db.models import Note
 from app.repositories.note_repository import NoteRepository
 
@@ -16,7 +17,8 @@ class NoteService:
     ) -> Note:
         cleaned_content = content.strip()
         if not cleaned_content:
-            raise ValueError("Note content cannot be empty")
+            raise ValidationError("Note content cannot be empty")
+
         return self.repo.create(
             content=cleaned_content,
             tags=tags,
@@ -26,5 +28,5 @@ class NoteService:
     def search_notes(self, query: str) -> list[Note]:
         cleaned_query = query.strip()
         if not cleaned_query:
-            raise ValueError("Search query cannot be empty")
+            raise ValidationError("Search query cannot be empty")
         return self.repo.search(cleaned_query)
