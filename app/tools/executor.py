@@ -2,6 +2,7 @@ import logging
 
 from sqlalchemy.orm import Session
 
+from app.core.exceptions import ValidationError
 from app.services.note_service import NoteService
 from app.services.task_service import TaskService
 
@@ -102,4 +103,4 @@ class ToolExecutor:
                 ],
             }
 
-        raise ValueError(f"Unknown tool: {tool_name}")
+        raise ValidationError(f"Unknown tool: {tool_name}")

@@ -17,8 +17,17 @@ class TaskService:
             raise ValidationError("Task title cannot be empty")
         return self.repo.create(title=cleaned_title, description=description)
 
-    def list_tasks(self) -> list[Task]:
-        return self.repo.list_all()
+    def list_tasks(self, status: str | None = None) -> list[Task]:
+        if status is None:
+            return self.repo.list_all()
+
+        normalized_status = status.strip().lower()
+        if normalized_status not in self.ALLOWED_STATUSES:
+            raise ValidationError(
+                f"Invalid status '{status}'. Allowed values: {sorted(self.ALLOWED_STATUSES)}"
+            )
+
+        return self.repo.list_by_status(normalized_status)
 
     def update_task_status(self, task_id: int, status: str) -> Task:
         normalized_status = status.strip().lower()

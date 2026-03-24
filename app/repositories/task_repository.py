@@ -15,7 +15,15 @@ class TaskRepository:
         return task
 
     def list_all(self) -> list[Task]:
-        return self.db.query(Task).order_by(Task.created_at.desc()).all()
+        return self.db.query(Task).order_by(Task.created_at.desc(), Task.id.desc()).all()
+
+    def list_by_status(self, status: str) -> list[Task]:
+        return (
+            self.db.query(Task)
+            .filter(Task.status == status)
+            .order_by(Task.created_at.desc(), Task.id.desc())
+            .all()
+        )
 
     def get_by_id(self, task_id: int) -> Task | None:
         return self.db.query(Task).filter(Task.id == task_id).first()

@@ -3,6 +3,7 @@ import logging
 
 from sqlalchemy.orm import Session
 
+from app.core.exceptions import ValidationError
 from app.services.conversation_service import ConversationService
 from app.services.llm_service import LLMService
 from app.tools.executor import ToolExecutor
@@ -18,16 +19,20 @@ class AgentService:
         self.conversation_service = ConversationService(db)
 
     def handle_message(self, message: str, conversation_id: int | None = None) -> tuple[str, int]:
+        cleaned_message = message.strip()
+        if not cleaned_message:
+            raise ValidationError("Message cannot be empty")
+
         if conversation_id is None:
             conversation = self.conversation_service.create_conversation(
-                title=message[:50].strip() or "New Conversation"
+                title=cleaned_message[:50] or "New Conversation"
             )
             conversation_id = conversation.id
             logger.info("Created new conversation: %s", conversation_id)
         else:
             self.conversation_service.get_conversation(conversation_id)
 
-        self.conversation_service.add_user_message(conversation_id, message)
+        self.conversation_service.add_user_message(conversation_id, cleaned_message)
 
         history = self.conversation_service.list_messages(conversation_id)
         llm_messages = [
@@ -56,7 +61,11 @@ class AgentService:
             function_call = function_calls[0]
             tool_name = function_call.name
             tool_args_raw = function_call.arguments or "{}"
-            tool_args = json.loads(tool_args_raw)
+
+            try:
+                tool_args = json.loads(tool_args_raw)
+            except json.JSONDecodeError as exc:
+                raise ValidationError(f"Invalid tool arguments returned by model: {exc}") from exc
 
             tool_result = self.tool_executor.execute(tool_name, tool_args)
 

@@ -6,6 +6,9 @@ from app.tools.definitions import TOOLS
 
 class LLMService:
     def __init__(self) -> None:
+        if not settings.openai_api_key:
+            raise ValueError("OPENAI_API_KEY is not configured")
+
         self.client = OpenAI(
             api_key=settings.openai_api_key,
             base_url=settings.openai_base_url,

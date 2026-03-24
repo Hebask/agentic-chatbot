@@ -17,6 +17,13 @@ class ConversationRepository:
     def get_conversation(self, conversation_id: int) -> Conversation | None:
         return self.db.query(Conversation).filter(Conversation.id == conversation_id).first()
 
+    def list_conversations(self) -> list[Conversation]:
+        return (
+            self.db.query(Conversation)
+            .order_by(Conversation.created_at.desc(), Conversation.id.desc())
+            .all()
+        )
+
     def add_message(self, conversation_id: int, role: str, content: str) -> Message:
         message = Message(
             conversation_id=conversation_id,

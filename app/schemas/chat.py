@@ -26,6 +26,18 @@ class ConversationCreateResponse(BaseModel):
     conversation_id: int
 
 
+class ConversationSummaryResponse(BaseModel):
+    id: int
+    title: str | None
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class ConversationListResponse(BaseModel):
+    conversations: list[ConversationSummaryResponse]
+
+
 class ConversationMessagesResponse(BaseModel):
     conversation_id: int
     messages: list[MessageResponse]
