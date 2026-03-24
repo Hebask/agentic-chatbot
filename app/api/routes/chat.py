@@ -32,7 +32,7 @@ def chat(payload: ChatRequest, db: Session = Depends(get_db)) -> ChatResponse:
     except ValidationError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except ValueError as exc:
-        raise HTTPException(status_code=500, detail=str(exc)) from exc
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Chat processing failed: {exc}") from exc
 

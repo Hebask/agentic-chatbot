@@ -41,7 +41,6 @@ agentic-chatbot/
 │   │   ├── note_repository.py
 │   │   └── task_repository.py
 │   ├── schemas/
-│   │   ├── base.py
 │   │   ├── chat.py
 │   │   ├── note.py
 │   │   └── task.py
