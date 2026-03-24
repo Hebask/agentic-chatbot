@@ -1,11 +1,11 @@
 # Agentic Task & Knowledge Chatbot
 
-A modular FastAPI-based **agentic chatbot** that can both answer user queries and take actions using tools.  
-The chatbot supports task management, note storage/search, and persistent conversation history.
+A modular FastAPI-based agentic chatbot that can both answer user queries and take actions using tools.  
+The system supports task management, note storage and search, and persistent conversation history.
 
 ## Features
 
-- FastAPI backend with automatic Swagger docs
+- FastAPI backend with automatic API docs
 - Agentic chatbot with tool-calling workflow
 - Persistent conversation history
 - Task creation, listing, filtering, and status updates
@@ -13,7 +13,7 @@ The chatbot supports task management, note storage/search, and persistent conver
 - SQLite persistence with SQLAlchemy ORM
 - `.env`-based configuration
 - Modular layered architecture
-- Basic automated tests with pytest
+- Automated tests with pytest
 
 ## Project Structure
 
@@ -57,6 +57,7 @@ agentic-chatbot/
 ├── tests/
 ├── .env.example
 ├── .gitignore
+├── pytest.ini
 ├── README.md
 ├── requirements.txt
 └── run.py
@@ -66,16 +67,16 @@ agentic-chatbot/
 - Python 3.11+
 - OpenAI API key or compatible endpoint
 ## Setup
-1. Create virtual environment
+1. Create a virtual environment
 ```bash
 python -m venv .venv
 ```
-2. Activate environment
-    - Windows PowerShell
+2. Activate it
+- Windows PowerShell
 ```bash
 .venv\Scripts\Activate.ps1
 ```
-    -Windows CMD
+- Windows CMD
 ```bash
 .venv\Scripts\activate
 ```
@@ -84,19 +85,28 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 4. Create .env
-    - Copy .env.example to .env and update the values:
+    Copy .env.example to .env and update the values:
+        APP_NAME=Agentic Chatbot
+        APP_ENV=development
+        APP_DEBUG=true
+        APP_HOST=127.0.0.1
+        APP_PORT=8000
+
+        DATABASE_URL=sqlite:///./agentic_chatbot.db
+
+        OPENAI_API_KEY=your_api_key_here
+        OPENAI_MODEL=gpt-5.4
+        OPENAI_BASE_URL=https://api.openai.com/v1
 
 5. Run the application
 ```bash
 python run.py
 ```
+## API Documentation
+    Once the server is running:
+        Swagger UI: http://127.0.0.1:8000/docs
+        ReDoc: http://127.0.0.1:8000/redoc
 
-# API Documentation
-
-Once the server is running, open:
-
-Swagger UI: http://127.0.0.1:8000/docs
-ReDoc: http://127.0.0.1:8000/redoc
 ## Main Endpoints
 - Health
     GET /health
@@ -112,42 +122,39 @@ ReDoc: http://127.0.0.1:8000/redoc
 - Notes
     POST /notes
     GET /notes/search?q=keyword
-
 ## Example Requests
 - Create a task directly
-POST /tasks
 ```json
-    {
-    "title": "Finish proposal",
-    "description": "Submit before Friday"
-    }
+{
+  "title": "Finish proposal",
+  "description": "Submit before Friday"
+}
 ```
 - Chat with the agent
-    POST /chat
 ```json
-    {
-    "message": "Create a task called finish the README"
-    }
+{
+  "message": "Create a task called finish the README"
+}
 ```
 - Continue a conversation
-    POST /chat
 ```json
-    {
-    "conversation_id": 1,
-    "message": "Now list all my tasks"
-    }
+{
+  "conversation_id": 1,
+  "message": "Now list all my tasks"
+}
 ```
+
 ## Testing
-- Run tests with:
-```bash
+- Run:
+``` bash
 pytest
 ```
-# Design Summary
-The project uses a layered architecture:
-- routes for HTTP handling
-- services for business logic
-- repositories for database access
-- tools for agent actions
-- db for persistence
-- core for configuration, logging, and exceptions
 
+## Design Summary
+- The project uses a layered architecture:
+    routes for HTTP handling
+    services for business logic
+    repositories for database access
+    tools for agent actions
+    db for persistence
+    core for configuration, logging, and exceptions
