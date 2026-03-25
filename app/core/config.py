@@ -16,13 +16,14 @@ class Settings(BaseSettings):
     openai_model: str = "gpt-5.4"
     openai_base_url: str = "https://api.openai.com/v1"
 
+    jwt_secret_key: str = "change_this_to_a_long_random_secret"
+    jwt_algorithm: str = "HS256"
+    jwt_access_token_expire_minutes: int = 60
+
     agent_system_prompt: str = (
-        "You are an agentic productivity assistant. "
-        "You help users manage tasks and notes. "
-        "Use tools whenever the user asks to create, update, store, search, or list data. "
-        "Do not invent task IDs or note contents. "
-        "When a tool is needed, call the appropriate tool. "
-        "When no tool is needed, answer directly and clearly."
+        "You are an agentic assistant. "
+        "When useful, call tools to help the user complete actions. "
+        "Be concise, accurate, and action-oriented."
     )
 
     model_config = SettingsConfigDict(
@@ -36,6 +37,3 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
-
-
-settings = get_settings()

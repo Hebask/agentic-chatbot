@@ -1,32 +1,26 @@
 from openai import OpenAI
 
-from app.core.config import settings
-from app.tools.definitions import TOOLS
+from app.core.config import get_settings
+
+settings = get_settings()
 
 
 class LLMService:
     def __init__(self) -> None:
-        if not settings.openai_api_key:
-            raise ValueError("OPENAI_API_KEY is not configured")
-
         self.client = OpenAI(
             api_key=settings.openai_api_key,
             base_url=settings.openai_base_url,
         )
         self.model = settings.openai_model
+        self.system_prompt = settings.agent_system_prompt
 
     def create_initial_response(self, messages: list[dict]):
-        input_messages = [
-            {
-                "role": "system",
-                "content": settings.agent_system_prompt,
-            }
-        ] + messages
+        input_messages = [{"role": "system", "content": self.system_prompt}, *messages]
 
         return self.client.responses.create(
             model=self.model,
             input=input_messages,
-            tools=TOOLS,
+            tools=[],
         )
 
     def continue_with_tool_output(
@@ -45,21 +39,9 @@ class LLMService:
                     "output": tool_output,
                 }
             ],
-            tools=TOOLS,
+            tools=[],
         )
 
     @staticmethod
     def extract_text(response) -> str:
-        output_text = getattr(response, "output_text", None)
-        if output_text:
-            return output_text.strip()
-
-        fragments: list[str] = []
-        for item in getattr(response, "output", []) or []:
-            if getattr(item, "type", None) == "message":
-                for content in getattr(item, "content", []) or []:
-                    text_value = getattr(content, "text", None)
-                    if text_value:
-                        fragments.append(text_value)
-
-        return "\n".join(fragments).strip() or "I could not generate a response."
+        return getattr(response, "output_text", "").strip()
