@@ -1,15 +1,16 @@
-from fastapi.testclient import TestClient
-from app.main import app
-
-client = TestClient(app)
-
-
-def test_create_note() -> None:
-    response = client.post(
+def test_create_and_search_note(client) -> None:
+    create_response = client.post(
         "/notes",
-        json={"content": "This is a test note", "tags": "test", "is_important": True},
+        json={
+            "title": "Meeting Notes",
+            "content": "Discussed FastAPI architecture and agent workflow",
+        },
     )
-    assert response.status_code == 200
-    data = response.json()
-    assert data["content"] == "This is a test note"
-    assert data["is_important"] is True
+    assert create_response.status_code == 200
+
+    search_response = client.get("/notes/search?q=FastAPI")
+    assert search_response.status_code == 200
+    data = search_response.json()
+    assert isinstance(data, list)
+    assert len(data) >= 1
+    assert any("FastAPI" in note["content"] for note in data)

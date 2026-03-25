@@ -6,14 +6,8 @@ TOOLS = [
         "parameters": {
             "type": "object",
             "properties": {
-                "title": {
-                    "type": "string",
-                    "description": "Short task title."
-                },
-                "description": {
-                    "type": "string",
-                    "description": "Optional task description."
-                }
+                "title": {"type": "string", "description": "Short task title."},
+                "description": {"type": "string", "description": "Optional task description."},
             },
             "required": ["title"],
             "additionalProperties": False,
@@ -36,14 +30,12 @@ TOOLS = [
         "parameters": {
             "type": "object",
             "properties": {
-                "task_id": {
-                    "type": "integer",
-                    "description": "The numeric ID of the task."
-                },
+                "task_id": {"type": "integer", "description": "The numeric ID of the task."},
                 "status": {
                     "type": "string",
-                    "description": "New status value, for example pending, in_progress, or completed."
-                }
+                    "description": (
+                        "New status value, for example pending, in_progress, or completed."
+                    ),                },
             },
             "required": ["task_id", "status"],
             "additionalProperties": False,
@@ -56,18 +48,12 @@ TOOLS = [
         "parameters": {
             "type": "object",
             "properties": {
-                "content": {
-                    "type": "string",
-                    "description": "The note text to store."
-                },
-                "tags": {
-                    "type": "string",
-                    "description": "Optional comma-separated tags."
-                },
+                "content": {"type": "string", "description": "The note text to store."},
+                "tags": {"type": "string", "description": "Optional comma-separated tags."},
                 "is_important": {
                     "type": "boolean",
-                    "description": "Whether this note is important."
-                }
+                    "description": "Whether this note is important.",
+                },
             },
             "required": ["content"],
             "additionalProperties": False,
@@ -82,7 +68,7 @@ TOOLS = [
             "properties": {
                 "query": {
                     "type": "string",
-                    "description": "Keyword or phrase to search for in notes."
+                    "description": "Keyword or phrase to search for in notes.",
                 }
             },
             "required": ["query"],

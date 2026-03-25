@@ -1,19 +1,61 @@
 # Agentic Task & Knowledge Chatbot
 
-A modular FastAPI-based agentic chatbot that can both answer user queries and take actions using tools.  
-The system supports task management, note storage and search, and persistent conversation history.
+A modular **FastAPI-based agentic chatbot backend** that can both answer user queries and take actions using tools.
+
+Unlike traditional chatbots, this system is designed to:
+- understand user intent
+- decide when actions are required
+- execute backend operations (tasks, notes, etc.)
+- persist and manage conversation state
+
+---
+
+## Project Objective
+
+The goal of this project is to build a **fully functional agentic chatbot system** that demonstrates:
+
+- action-taking behavior (not just Q&A)
+- clean backend architecture
+- modular service design
+- proper separation of concerns
+- industrial-level coding practices
+
+This project reflects modern AI systems where chatbots act as **intelligent agents** capable of interacting with tools and workflows.
+
+---
 
 ## Features
 
-- FastAPI backend with automatic API docs
+- FastAPI backend with automatic API documentation
 - Agentic chatbot with tool-calling workflow
 - Persistent conversation history
-- Task creation, listing, filtering, and status updates
-- Note creation and keyword search
-- SQLite persistence with SQLAlchemy ORM
-- `.env`-based configuration
-- Modular layered architecture
-- Automated tests with pytest
+- Task creation, listing, filtering, and updates
+- Note creation and keyword-based search
+- SQLite persistence using SQLAlchemy ORM
+- Environment-based configuration (`.env`)
+- Clean modular architecture (routes → services → repositories)
+- Automated testing using pytest
+
+---
+
+## What Makes This Agentic?
+
+Unlike simple chatbots, this system follows an **agent workflow**:
+
+1. Receive user message
+2. Analyze intent using the language model
+3. Decide if a tool/action is needed
+4. Execute the tool (e.g., create task, fetch notes)
+5. Return a final response
+6. Store conversation history
+
+This allows the chatbot to:
+- create tasks
+- retrieve information
+- manage user data
+- behave as a functional assistant
+
+---
 
 ## Project Structure
 
@@ -21,57 +63,47 @@ The system supports task management, note storage and search, and persistent con
 agentic-chatbot/
 ├── app/
 │   ├── api/
-│   │   ├── deps.py
-│   │   └── routes/
-│   │       ├── chat.py
-│   │       ├── health.py
-│   │       ├── notes.py
-│   │       └── tasks.py
 │   ├── core/
-│   │   ├── config.py
-│   │   ├── exceptions.py
-│   │   └── logging.py
 │   ├── db/
-│   │   ├── base.py
-│   │   ├── init_db.py
-│   │   ├── models.py
-│   │   └── session.py
 │   ├── repositories/
-│   │   ├── conversation_repository.py
-│   │   ├── note_repository.py
-│   │   └── task_repository.py
 │   ├── schemas/
-│   │   ├── chat.py
-│   │   ├── note.py
-│   │   └── task.py
 │   ├── services/
-│   │   ├── agent_service.py
-│   │   ├── conversation_service.py
-│   │   ├── llm_service.py
-│   │   ├── note_service.py
-│   │   └── task_service.py
 │   ├── tools/
-│   │   ├── definitions.py
-│   │   └── executor.py
 │   └── main.py
+├── docs/
+│   ├── market_research.md
+│   ├── proposal.md
+│   └── architecture.md
 ├── tests/
 ├── .env.example
-├── .gitignore
-├── pytest.ini
 ├── README.md
 ├── requirements.txt
 └── run.py
 ```
+## Architecture Overview
+    The system follows a layered architecture:
+        - API Layer → Handles HTTP requests
+        - Service Layer → Contains business logic and agent orchestration
+        - Repository Layer → Manages database interactions
+        - Database Layer → Stores persistent data
+        - Tools Layer → Executes actions requested by the agent
+    
+    This separation improves:
+        - maintainability
+        - testability
+        - scalability
 
 ## Requirements
 - Python 3.11+
-- OpenAI API key or compatible endpoint
+- OpenAI API key (or compatible endpoint)
+
 ## Setup
-1. Create a virtual environment
-```bash
+1. Create virtual environment
+```bash 
 python -m venv .venv
 ```
-2. Activate it
+
+2. Activate environment
 - Windows PowerShell
 ```bash
 .venv\Scripts\Activate.ps1
@@ -80,12 +112,14 @@ python -m venv .venv
 ```bash
 .venv\Scripts\activate
 ```
+
 3. Install dependencies
 ```bash
 pip install -r requirements.txt
 ```
-4. Create .env
-    Copy .env.example to .env and update the values:
+
+4. Configure environment
+- Copy .env.example to .env and update values:
         APP_NAME=Agentic Chatbot
         APP_ENV=development
         APP_DEBUG=true
@@ -98,45 +132,46 @@ pip install -r requirements.txt
         OPENAI_MODEL=gpt-5.4
         OPENAI_BASE_URL=https://api.openai.com/v1
 
-5. Run the application
+## Running the Application
 ```bash
 python run.py
 ```
+
 ## API Documentation
-    Once the server is running:
-        Swagger UI: http://127.0.0.1:8000/docs
-        ReDoc: http://127.0.0.1:8000/redoc
+    - Swagger UI: http://127.0.0.1:8000/docs
+    - ReDoc: http://127.0.0.1:8000/redoc
 
 ## Main Endpoints
-- Health
-    GET /health
-- Chat
-    POST /chat
-    POST /chat/conversations
-    GET /chat/conversations
-    GET /chat/conversations/{conversation_id}
-- Tasks
-    POST /tasks
-    GET /tasks
-    PATCH /tasks/{task_id}/status
-- Notes
-    POST /notes
-    GET /notes/search?q=keyword
+    - Health
+        GET /health
+    - Chat
+        POST /chat
+        POST /chat/conversations
+        GET /chat/conversations
+        GET /chat/conversations/{conversation_id}
+    - Tasks
+        POST /tasks
+        GET /tasks
+        PATCH /tasks/{task_id}/status
+    - Notes
+        POST /notes
+        GET /notes/search?q=keyword
+
 ## Example Requests
-- Create a task directly
+- Create a Task
 ```json
 {
   "title": "Finish proposal",
   "description": "Submit before Friday"
 }
 ```
-- Chat with the agent
+- Chat with Agent
 ```json
 {
   "message": "Create a task called finish the README"
 }
 ```
-- Continue a conversation
+- Continue Conversation
 ```json
 {
   "conversation_id": 1,
@@ -144,17 +179,48 @@ python run.py
 }
 ```
 
+## Demo Flow
+1. Start the server
+2. Open Swagger UI
+3. Create a conversation
+3. Send:
+    "Create a task called submit assignment"
+4. Then send:
+    "List all my tasks"
+5. Observe:
+    Task is created
+    Agent retrieves stored data
+    Conversation is persisted
+
+This demonstrates full agentic behavior.
+
 ## Testing
 - Run:
-``` bash
+```bash
 pytest
 ```
-
 ## Design Summary
-- The project uses a layered architecture:
-    routes for HTTP handling
-    services for business logic
-    repositories for database access
-    tools for agent actions
-    db for persistence
-    core for configuration, logging, and exceptions
+- The project follows a modular layered design:
+    Routes → HTTP handling
+    Services → business logic
+    Repositories → database access
+    Tools → agent actions
+    DB → persistence
+    Core → config, logging, exceptions
+
+## Limitations
+    Uses SQLite (not production-scalable)
+    No authentication/authorization
+    Depends on external LLM API
+    No rate limiting or background workers
+
+## Future Improvements
+    Add authentication (JWT)
+    Switch to PostgreSQL
+    Add Docker support
+    Implement async task queue
+    Add streaming responses
+    Improve observability and logging
+
+## Conclusion
+This project demonstrates how to build an agentic AI system using FastAPI with clean architecture and real-world backend design principles. It goes beyond traditional chatbots by enabling action-oriented behavior, making it more aligned with modern AI applications.
